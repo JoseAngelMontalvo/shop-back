@@ -1,49 +1,100 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
-const isValidationNewUser = require("../routes/users/validations");
 
 module.exports = {
     newUser: async(req, res) => {
 
         const user = req.body;
-        const { name, email, password } = req.body;
+        const { name, email, password, role } = req.body;
         try {
 
-            //await isValidationNewUser(user);
-
-            /* const validationName = await User.findOne({ name });
-            if (validationName) return res.status(409).json({ message: `El usuario con el nombre ${name}, ya existe` });
-
-            const validationEmail = await User.findOne({ email });
-            if (validationEmail) return res.status(409).json({ message: `El usuario con el email ${email}, ya existe` });
-
-            const regex = /^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{8,16}$/;
-            if (!regex.test(password)) return res.status(409).json({ message: `El usuario con el email ${email}, ya existe` }); */
-
             const hashPass = bcrypt.hashSync(password, 10);
-            const newUser = new User({ name, email, password: hashPass })
+            const newUser = new User({ name, email, password: hashPass, role })
             const userDB = await newUser.save();
-            //console.log(userDB);
             res.status(200).json(userDB);
 
         } catch (error) {
-
-            console.log(error.messageEmail);
-
-            const errorMessages = error.map((err) => {
-                return err.message;
-            })
-
-            if (error[0].status) res.status(error[0].status).json(error);
-            else res.status(500).json({ message: "Internal server error" });
+            res.status(500).json({ message: "Internal server error" });
         }
 
+    },
+    updateUser: async(req, res) => {
+
+        const { id } = req.params;
+        const { name, email, password } = req.body;
+        const userdata = { name, email, password };
+
         try {
-            console.log("El hilo sigue")
-        } catch (e) {
+
+            const options = {
+                new: true,
+                runValidators: true
+            }
+            const userDB = await User.findByIdAndUpdate(id, userdata, options);
+            res.status(200).json(userDB);
+        } catch (error) {
+            res.status(400).json({ message: "Internal server error" })
+        }
+    },
+    deleteUser: async(req, res) => {
+        const { id } = req.params;
+        try {
+            const userdelete = await User.findByIdAndDelete(id);
+            res.status(200).json(userdelete);
+        } catch (error) {
+            console.log(error);
+            res.status(400).json({ message: "Internal server error" });
+        }
+
+    },
+    getAllUsers: async(req, res) => {
+        const allusers = await User.find();
+        try {
+            res.status(200).json(allusers);
+        } catch (error) {
+            res.status(400).json({ message: "Internal server error" });
+        }
+    },
+    getUserById: async(req, res) => {
+        try {
+
+            const { id } = req.params;
+            const userDB = await User.findById(id);
+            res.status(200).json(userDB);
+        } catch (error) {
+            res.status(400).json({ message: "Internal server error" });
+
+        }
+    },
+    getUserByRole: async(req, res) => {
+        try {
+            const { name, role } = req.params;
+            const userDB = await User.find({ $and: [{ name: name }, { role: role }] });
+            res.status(200).json(userDB);
+        } catch (error) {
+            res.status(400).json({ message: "Internal server error" });
 
         }
     }
+
+    /* router.get("/get/:name/:lastname", async (req, res) => {
+    const { name, lastname } = req.params;
+    try {
+      const userDB = await User.find({ $and: [{ name }, { _id: lastname }], { password: 0 })
+        .skip(4)
+        .limit(10);
+  
+      const usersCount = await User.count({})
+        .skip(4)
+        .limit(10);
+  
+      res.json({ userDB, usersCount });
+    } catch (error) {
+      console.log(error);
+      res.status(400).json(error);
+    }
+  }); */
+
 
 
 };

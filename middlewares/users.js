@@ -5,12 +5,6 @@ module.exports = {
         const { name, email, password, confirmPassword } = req.body;
         let errors = [];
 
-        if (password != confirmPassword)
-            errors.push({
-                messageconfirmPassword: `Las contraseñas no coinciden`
-            });
-
-
         const validationName = await User.findOne({ name });
         if (validationName)
             errors.push({
@@ -28,6 +22,12 @@ module.exports = {
             errors.push({
                 messagePasword: `La contraseña introducida no cumple los requisitos minimos`
             });
+
+        if (password != confirmPassword)
+            errors.push({
+                messageconfirmPassword: `Las contraseñas no coinciden`
+            });
+
         if (errors.length) return res.status(422).json({ errors: errors, ok: false });
 
         next()

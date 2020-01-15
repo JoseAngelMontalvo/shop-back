@@ -2,14 +2,19 @@ const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
 const Schema = mongoose.Schema;
 
+/* const moment = require('moment-timezone');
+const dateSpain = moment.tz(Date.now(), "Europe/Madrid"); */
+
 const userSchema = new Schema({
     name: {
         type: String,
-        require: [true, "Name es requerido"]
+        require: [true, "Name es requerido"],
+        //unique: true
     },
     email: {
         type: String,
-        require: [true, "Email es requerido"]
+        require: [true, "Email es requerido"],
+        //unique: true
     },
     password: {
         type: String,
@@ -22,7 +27,7 @@ const userSchema = new Schema({
     role: {
         type: String,
         default: "USER_ROLE",
-        enum: ["USER_ROLE", "ADMIN_ROLE"]
+        enum: ["USER_ROLE", "ADMIN_ROLE", "SUPERADMIN_ROLE"]
     },
     date: {
         type: Date,

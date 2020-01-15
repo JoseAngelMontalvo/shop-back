@@ -3,8 +3,7 @@ const router = Express.Router();
 
 const userController = require("../../controllers/users");
 
-
-router.post("/:id", userController.deleteUser);
+router.get("/:name/:role", userController.getUserByRole);
 
 
 module.exports = router;
