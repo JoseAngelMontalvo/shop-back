@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const DB_PORT = process.env.DB_PORT;
-
+const bodyParser = require("body-parser");
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
@@ -15,9 +15,11 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+//Esta configuracion para recoger el body de express esta deprecated es mejor con bodyPaser
+/* app.use(express.json());
+app.use(express.urlencoded({ extended: false })); */
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
