@@ -4,25 +4,25 @@ const bcrypt = require("bcryptjs");
 module.exports = {
     newUser: async(req, res) => {
 
-        const user = req.body;
-        const { name, email, password, role } = req.body;
+        const { username, email, password, role } = req.body;
         try {
 
             const hashPass = bcrypt.hashSync(password, 10);
-            const newUser = new User({ name, email, password: hashPass, role })
+            const newUser = new User({ username, email, password: hashPass, role })
             const userDB = await newUser.save();
             res.status(200).json(userDB);
 
         } catch (error) {
-            res.status(500).json({ message: "Internal server error" });
+            res.status(400).json({ message: "Internal server error, no user create" });
         }
 
     },
     updateUser: async(req, res) => {
 
         const { id } = req.params;
-        const { name, email, password } = req.body;
-        const userdata = { name, email, password };
+        const { username, email, password, role } = req.body;
+        const hashPass = bcrypt.hashSync(password, 10);
+        const userdata = { username, email, password: hashPass, role };
 
         try {
 
@@ -33,7 +33,7 @@ module.exports = {
             const userDB = await User.findByIdAndUpdate(id, userdata, options);
             res.status(200).json(userDB);
         } catch (error) {
-            res.status(400).json({ message: "Internal server error" })
+            res.status(400).json({ message: "Internal server error, no user update" });
         }
     },
     deleteUser: async(req, res) => {
@@ -42,17 +42,16 @@ module.exports = {
             const userdelete = await User.findByIdAndDelete(id);
             res.status(200).json(userdelete);
         } catch (error) {
-            console.log(error);
-            res.status(400).json({ message: "Internal server error" });
+            res.status(400).json({ message: "Internal server error, no user delete" });
         }
 
     },
     getAllUsers: async(req, res) => {
-        const allusers = await User.find();
         try {
+            const allusers = await User.find();
             res.status(200).json(allusers);
         } catch (error) {
-            res.status(400).json({ message: "Internal server error" });
+            res.status(400).json({ message: "Internal server error, no users get" });
         }
     },
     getUserById: async(req, res) => {
@@ -62,18 +61,16 @@ module.exports = {
             const userDB = await User.findById(id);
             res.status(200).json(userDB);
         } catch (error) {
-            res.status(400).json({ message: "Internal server error" });
-
+            res.status(400).json({ message: "Internal server error, no user get" });
         }
     },
-    getUserByRole: async(req, res) => {
+    getUserByUsernameAndRole: async(req, res) => {
         try {
-            const { name, role } = req.params;
-            const userDB = await User.find({ $and: [{ name: name }, { role: role }] });
+            const { username, role } = req.params;
+            const userDB = await User.find({ $and: [{ username: username }, { role: role }] });
             res.status(200).json(userDB);
         } catch (error) {
-            res.status(400).json({ message: "Internal server error" });
-
+            res.status(400).json({ message: "Internal server error, no user get by username and role" });
         }
     }
 

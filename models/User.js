@@ -6,7 +6,7 @@ const Schema = mongoose.Schema;
 const dateSpain = moment.tz(Date.now(), "Europe/Madrid"); */
 
 const userSchema = new Schema({
-    name: {
+    username: {
         type: String,
         require: [true, "Name es requerido"],
         //unique: true
