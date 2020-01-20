@@ -1,7 +1,7 @@
 const User = require("../../../models/User");
 
 module.exports = async(user) => {
-    const { name, email, password, confirmPassword } = user;
+    const { username, email, password, confirmPassword } = user;
     let errors = [];
 
     if (password != confirmPassword)
@@ -12,11 +12,11 @@ module.exports = async(user) => {
         });
 
 
-    const validationName = await User.findOne({ name });
+    const validationName = await User.findOne({ username });
     if (validationName)
         errors.push({
             status: 409,
-            messageName: `El usuario con el nombre ${name}, ya existe`,
+            messageName: `El usuario con el nombre ${username}, ya existe`,
             ok: false
         });
 

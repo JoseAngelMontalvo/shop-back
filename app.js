@@ -1,15 +1,84 @@
 require("dotenv").config();
-var express = require('express');
-var path = require('path');
+const createError = require("http-errors");
+const express = require('express');
+const path = require('path');
 const mongoose = require("mongoose");
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
 const DB_PORT = process.env.DB_PORT;
 const bodyParser = require("body-parser");
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+const bcrypt = require("bcryptjs");
+const User = require("./models/User");
 
-var app = express();
+const session = require("express-session");
+const passport = require("passport");
+const LocalStrategy = require("passport-local").Strategy;
+const flash = require("connect-flash");
+
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
+const authRouter = require("./routes/auth");
+
+const app = express();
+
+//login
+app.use(
+    session({
+        secret: "passport-authentication",
+        resave: true,
+        saveUninitialized: true
+    })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser((user, callback) => {
+    console.log("SERIALIZADOR");
+    callback(null, user);
+});
+
+passport.deserializeUser(async(id, callback) => {
+    console.log("DESERIALIZADOR");
+
+    try {
+        const user = await User.findById(id);
+
+        if (!user) return callback({ message: "El usuario no existe" });
+
+        return callback(null, user);
+    } catch (error) {
+        console.log(error);
+        return callback(error);
+    }
+});
+
+app.use(flash());
+passport.use(
+    new LocalStrategy({
+            passReqToCallback: true
+        },
+        async(req, username, password, next) => {
+            console.log("LOCAL-STRATEGY");
+            console.log(password);
+            try {
+                console.log("USER" + username);
+                const user = await User.findOne({ username });
+
+                if (!user)
+                    return next(null, false, { message: "El usuario no existe" });
+
+                if (!bcrypt.compareSync(password, user.password))
+                    return next(null, false, { message: "La contraseña no es correcta" });
+                console.log(user);
+                next(null, user);
+            } catch (error) {
+                next(error);
+            }
+        }
+    )
+);
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -26,6 +95,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 //rutas
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use("/auth", authRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

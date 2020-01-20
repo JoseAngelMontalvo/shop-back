@@ -6,7 +6,7 @@ module.exports = {
     newUser: async(req, res) => {
 
         const user = req.body;
-        const { name, email, password } = req.body;
+        const { username, email, password } = req.body;
         try {
 
             //await isValidationNewUser(user);
@@ -21,7 +21,7 @@ module.exports = {
             if (!regex.test(password)) return res.status(409).json({ message: `El usuario con el email ${email}, ya existe` }); */
 
             const hashPass = bcrypt.hashSync(password, 10);
-            const newUser = new User({ name, email, password: hashPass })
+            const newUser = new User({ username, email, password: hashPass })
             const userDB = await newUser.save();
             //console.log(userDB);
             res.status(200).json(userDB);
