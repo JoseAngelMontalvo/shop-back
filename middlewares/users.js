@@ -2,14 +2,21 @@ const User = require("../models/User");
 
 module.exports = {
     newUser: async(req, res, next) => {
+
         const { username, email, password, confirmPassword, role } = req.body;
         let errors = [];
 
-        const validationName = await User.findOne({ username });
-        if (validationName)
+        if (!username.length) {
             errors.push({
-                messageName: `El usuario con el nombre ${username}, ya existe`,
+                messageEmptyName: `Debe introducir un username`,
             });
+        } else {
+            const validationName = await User.findOne({ username });
+            if (validationName)
+                errors.push({
+                    messageName: `El usuario con el nombre ${username}, ya existe`,
+                });
+        }
 
         const regexEmail = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         if (!regexEmail.test(email))
@@ -57,11 +64,17 @@ module.exports = {
         if (validateUserId === null)
             return res.status(422).json({ messageNoUser: `El usuario con el id ${id} no existe`, ok: false });
 
-        const validationName = await User.findOne({ username });
-        if (validationName)
+        if (!username.length) {
             errors.push({
-                messageName: `El usuario con el nombre ${username}, ya existe`,
+                messageEmptyName: `Debe introducir un username`,
             });
+        } else {
+            const validationName = await User.findOne({ username });
+            if (validationName)
+                errors.push({
+                    messageName: `El usuario con el nombre ${username}, ya existe`,
+                });
+        }
 
         const regexEmail = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         if (!regexEmail.test(email))
@@ -99,9 +112,14 @@ module.exports = {
 
     deleteUser: async(req, res, next) => {
         const { id } = req.params;
+        if (!id.length)
+            return res.status(422).json({ messageNoId: "Debe introducir un id de Usuario", ok: false });
+
         const validateUserId = await User.findById(id);
+
         if (validateUserId === null)
             return res.status(422).json({ messageNoUser: `El usuario con el id ${id} no existe`, ok: false });
+
         next();
     },
 
@@ -115,26 +133,43 @@ module.exports = {
 
     getUserById: async(req, res, next) => {
         const { id } = req.params;
+        if (!id.length)
+            return res.status(422).json({ messageNoId: "Debe introducir un id de Usuario", ok: false });
+
         const validateUserId = await User.findById(id);
+
         if (validateUserId === null)
             return res.status(422).json({ messageNoUser: `El usuario con el id ${id} no existe`, ok: false });
+
         next();
     },
     getUserByUsernameAndRole: async(req, res, next) => {
         const { username, role } = req.params;
         let errors = [];
 
-        const validationName = await User.findOne({ username });
-        if (validationName === null)
+        if (!username.length) {
             errors.push({
-                messageName: `El usuario con el nombre ${username}, no existe`,
+                messageEmptyName: `Debe introducir un username`,
             });
+        } else {
+            const validationName = await User.findOne({ username });
+            if (validationName === null)
+                errors.push({
+                    messageName: `El usuario con el nombre ${username}, no existe`,
+                });
+        }
 
-        const existRole = await process.env.ROLES_USER.split(" ").includes(role);
-        if (!existRole)
+        if (!role.length) {
             errors.push({
-                messageconRole: `El role seleccionado no es valido`
+                messageEmptyRole: `Debe introducir un role`,
             });
+        } else {
+            const existRole = await process.env.ROLES_USER.split(" ").includes(role);
+            if (!existRole)
+                errors.push({
+                    messageconRole: `El role seleccionado no es valido`
+                });
+        }
 
         if (errors.length) return res.status(422).json({ errors: errors, ok: false });
 

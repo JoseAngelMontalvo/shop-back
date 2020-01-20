@@ -24,8 +24,7 @@ module.exports = {
         const hashPass = bcrypt.hashSync(password, 10);
         const userdata = { username, email, password: hashPass, role };
 
-        try {
-
+        try {;
             const options = {
                 new: true,
                 runValidators: true
