@@ -4,7 +4,7 @@ const bcrypt = require("bcryptjs");
 module.exports = {
     newUser: async(req, res) => {
 
-        const user = req.body;
+
         const { name, email, password, role } = req.body;
         try {
 
