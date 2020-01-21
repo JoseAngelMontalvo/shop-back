@@ -13,11 +13,14 @@ const User = require("./models/User");
 const session = require("express-session");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
+//const GoogleStrategy = require("passport-google").Strategy;
+const GoogleStrategy = require("passport-google-oauth").OAuth2Strategy;
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const flash = require("connect-flash");
 
 const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
-const authRouter = require("./routes/auth");
+
 
 const app = express();
 
@@ -34,7 +37,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 passport.serializeUser((user, callback) => {
-    console.log("SERIALIZADOR");
+    console.log("SERIALIZADOR:");
     callback(null, user);
 });
 
@@ -56,22 +59,45 @@ passport.deserializeUser(async(id, callback) => {
 app.use(flash());
 passport.use(
     new LocalStrategy({
+            usernameField: "userauth",
+            passwordField: "password",
+            // Dado que no haremos uso de sesiones, es necesaria especificarlo en las distintas estrategias poniendolo a false. 
+            session: true,
             passReqToCallback: true
         },
-        async(req, username, password, next) => {
+        async(req, userauth, password, next) => {
+            console.log(userauth);
             console.log("LOCAL-STRATEGY");
-            console.log(password);
+
             try {
-                console.log("USER" + username);
-                const user = await User.findOne({ username });
 
-                if (!user)
-                    return next(null, false, { message: "El usuario no existe" });
+                if (userauth.includes("@")) {
+                    const email = userauth;
+                    const user = await User.findOne({ email });
 
-                if (!bcrypt.compareSync(password, user.password))
-                    return next(null, false, { message: "La contraseña no es correcta" });
-                console.log(user);
-                next(null, user);
+                    if (!user)
+                        return next(null, false, { message: "El usuario no existe" });
+
+                    if (!bcrypt.compareSync(password, user.password))
+                        return next(null, false, { message: "La contraseña no es correcta" });
+
+                    next(null, user);
+
+                } else {
+                    const username = userauth;
+                    const user = await User.findOne({ username });
+
+                    if (!user)
+                        return next(null, false, { message: "El usuario no existe" });
+
+                    if (!bcrypt.compareSync(password, user.password))
+                        return next(null, false, { message: "La contraseña no es correcta" });
+
+                    next(null, user);
+
+                }
+
+
             } catch (error) {
                 next(error);
             }
@@ -79,23 +105,63 @@ passport.use(
     )
 );
 
+//Autenticacion por google
+/* passport.use(new GoogleStrategy({
+        returnURL: 'http://localhost:3000/auth/google/return',
+        realm: 'http://localhost:3000/'
+    },
+    function(identifier, done) {
+        User.findByOpenID({ openId: identifier }, function(err, user) {
+            return done(err, user);
+        });
+    }
+)); */
+passport.use(new GoogleStrategy({
+        clientID: GOOGLE_CLIENT_ID,
+        clientSecret: GOOGLE_CLIENT_SECRET,
+        callbackURL: "http://localhost:3000/auth/login/google/callback"
+    },
+    function(accessToken, refreshToken, profile, done) {
+
+
+        console.log(profile.id);
+        var id = mongoose.Types.ObjectId(profile.id);
+
+        /* const user = User.findById({ id });
+
+        if (!user)
+            return next(null, false, { message: "El usuario no existe" });
+
+        return next(null, user); */
+
+        User.findById(id, function(err, user) {
+            return done(err, user);
+        });
+
+        /* User.findOrCreate({ googleId: profile.id }, function(err, user) {
+            return done(err, user);
+        }); */
+    }
+));
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 
+app.use(logger("dev"));
 //Esta configuracion para recoger el body de express esta deprecated es mejor con bodyPaser
 /* app.use(express.json());
 app.use(express.urlencoded({ extended: false })); */
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+app.use(cookieParser());
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 //rutas
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
-app.use("/auth", authRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
