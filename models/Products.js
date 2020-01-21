@@ -20,20 +20,23 @@ const productSchema = new Schema({
         require: [true, "Tienda es requerido"]
     },
     categories: {
-        type: String,
+        type: Array,
         require: [true, "Categoria es requerida"],
         default: "Otras",
-        enum: ["Otras", "Moda", "Electrodomesticos", "Telefonía móvil", "Deporte y Ocio"]
+        //enum: ["Otras", "Moda", "Electrodomesticos", "Telefonía móvil", "Deporte y Ocio"]
     },
     details: {
         type: String
     },
-    faq: {
-        type: String
-    },
-    ratings: {
-        type: String
-    },
+    faq: [{
+        id: { type: String },
+        resp: { type: String }
+    }],
+    ratings: [{
+        id: { type: String },
+        rate: { type: String },
+        valoration: { type: String }
+    }],
     date: {
         type: Date,
         default: Date.now
