@@ -124,23 +124,12 @@ passport.use(new GoogleStrategy({
     function(accessToken, refreshToken, profile, done) {
 
 
-        console.log(profile.id);
-        var id = mongoose.Types.ObjectId(profile.id);
+        console.log(profile.emails[0].value);
+        
 
-        /* const user = User.findById({ id });
-
-        if (!user)
-            return next(null, false, { message: "El usuario no existe" });
-
-        return next(null, user); */
-
-        User.findById(id, function(err, user) {
+        User.findOrCreate({ googleId: profile.id }, function(err, user) {
             return done(err, user);
         });
-
-        /* User.findOrCreate({ googleId: profile.id }, function(err, user) {
-            return done(err, user);
-        }); */
     }
 ));
 
