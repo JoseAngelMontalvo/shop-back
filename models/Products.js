@@ -28,12 +28,18 @@ const productSchema = new Schema({
     details: {
         type: String
     },
+    createdby: {
+        type: String
+    },
+    updatedby: {
+        type: String
+    },
     faq: [{
         id: { type: String },
         resp: { type: String }
     }],
     ratings: [{
-        id: { type: String },
+        iduser: { type: String },
         rate: { type: String },
         valoration: { type: String }
     }],
