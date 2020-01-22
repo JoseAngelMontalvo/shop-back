@@ -9,8 +9,8 @@ const DB_PORT = process.env.DB_PORT;
 const bodyParser = require("body-parser");
 const bcrypt = require("bcryptjs");
 const User = require("./models/User");
-
 const session = require("express-session");
+const MongoStore = require('connect-mongo')(session);
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 //const GoogleStrategy = require("passport-google").Strategy;
@@ -24,15 +24,33 @@ const indexRouter = require('./routes/index');
 
 const app = express();
 
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
+
+//conexion a la base de datos
+mongoose.connect(`mongodb://localhost:${DB_PORT}/app`, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    })
+    .then(() => console.log(`Base de datos conectada en el puerto ${DB_PORT}`))
+    .catch(err => { throw err })
+
+//mongoose.Promise = global.Promise;
+//const db = mongoose.connection
+
 //login
 app.use(
     session({
+        saveUninitialized: true, // saved new sessions
+        resave: false, // do not automatically write to the session store
+        store: new MongoStore({ mongooseConnection: mongoose.connection }),
         secret: "passport-authentication",
-        resave: true,
-        saveUninitialized: true
+        cookie: { httpOnly: true, maxAge: 2419200000 } // configure when sessions expires
     })
 );
-
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -125,7 +143,7 @@ passport.use(new GoogleStrategy({
 
 
         console.log(profile.emails[0].value);
-        
+
 
         User.findOrCreate({ googleId: profile.id }, function(err, user) {
             return done(err, user);
@@ -139,15 +157,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 
 app.use(logger("dev"));
-//Esta configuracion para recoger el body de express esta deprecated es mejor con bodyPaser
-/* app.use(express.json());
-app.use(express.urlencoded({ extended: false })); */
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use(cookieParser());
 
-app.use(express.static(path.join(__dirname, 'public')));
 
 //rutas
 app.use('/', indexRouter);
@@ -168,11 +179,6 @@ app.use(function(err, req, res, next) {
     res.render('error');
 });
 
-mongoose.connect(`mongodb://localhost:${DB_PORT}/app`, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-    })
-    .then(() => console.log(`Base de datos conectada en el puerto ${DB_PORT}`))
-    .catch(err => { throw err })
+
 
 module.exports = app;
