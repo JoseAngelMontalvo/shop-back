@@ -44,11 +44,12 @@ mongoose.connect(`mongodb://localhost:${DB_PORT}/app`, {
 //login
 app.use(
     session({
-        saveUninitialized: true, // saved new sessions
+        saveUninitialized: false, // saved new sessions
         resave: false, // do not automatically write to the session store
+        //touchAfter: 60,
         store: new MongoStore({ mongooseConnection: mongoose.connection }),
         secret: "passport-authentication",
-        cookie: { httpOnly: true, maxAge: 2419200000 } // configure when sessions expires
+        cookie: { httpOnly: true, maxAge: 3600000 } // configure when sessions expires
     })
 );
 app.use(passport.initialize());
@@ -69,7 +70,6 @@ passport.deserializeUser(async(id, callback) => {
 
         return callback(null, user);
     } catch (error) {
-        console.log(error);
         return callback(error);
     }
 });
@@ -139,15 +139,29 @@ passport.use(new GoogleStrategy({
         clientSecret: GOOGLE_CLIENT_SECRET,
         callbackURL: "http://localhost:3000/auth/login/google/callback"
     },
-    function(accessToken, refreshToken, profile, done) {
+    async function(accessToken, refreshToken, profile, next) {
 
+        console.log(profile);
+        const email = profile.emails[0].value;
 
-        console.log(profile.emails[0].value);
+        const user = await User.findOneAndUpdate({ email }, { googleid: profile.id, googleauth: true }, { new: true, runValidators: true })
+        if (user) {
+            next(null, user);
+        } else {
+            const newUser = new User({ username: null, email: email, password: null, googleid: profile.id, googleauth: true });
+            const user = await newUser.save();
+            next(null, user);
+        }
 
-
-        User.findOrCreate({ googleId: profile.id }, function(err, user) {
-            return done(err, user);
-        });
+        /* try {
+            const user = await User.findOneAndUpdate({ email }, { googleid: profile.id, googleauth: true }, { new: true, runValidators: true });
+            console.log("USUARIO", user);
+            next(null, user);
+        } catch (err) {
+            console.log("HOLA");
+            next(err, null);
+        } */
+        //return done(err, user);
     }
 ));
 
