@@ -7,21 +7,13 @@ const passport = require("passport");
 router.get("/", (req, res) => res.render("auth/signup"));
 
 router.post("/", async(req, res) => {
-    const { username, password, email } = req.body;
-
-    try {
-        const user = await User.findOne({ username });
-        if (user) return res.render("auth/signup", { error: "El username ya existe" });
-    } catch (error) {
-        return res.render("auth/signup", { message: "Hubo un error" });
-    }
+    const { name, lastname, email, password, confirmpassword } = req.body;
 
     try {
         const user = await User.findOne({ email });
-        if (user.username === null && user.password === null && user.googleauth === true) {
+        if (user.name === "" && user.lastname === "" && user.password === "") {
             const hashPass = bcrypt.hashSync(password, 10);
-            const userDB = await User.findOneAndUpdate({ email }, { username: username, password: hashPass }, { new: true, runValidators: true })
-            console.log("USER UPDATE BY LOGIN", userDB);
+            const userDB = await User.findOneAndUpdate({ email }, { name: name, lastname: lastname, password: hashPass }, { new: true, runValidators: true })
             return res.render("/", userDB);
         } else {
             return res.render("signup", { error: "El email ya existe" });
@@ -33,7 +25,7 @@ router.post("/", async(req, res) => {
 
     try {
         const hashPass = bcrypt.hashSync(password, 10);
-        const user = new User({ username, password: hashPass, email });
+        const user = new User({ name, lastname, password: hashPass, email });
 
         await user.save();
 
@@ -50,12 +42,12 @@ router.get('/google',
         ]
     }));
 
-router.get('/google/callback',
-    passport.authenticate('google', { failureRedirect: '/auth/signup' }),
-    function(req, res) {
-        const { user } = req.user;
-        console.log("USER SIGNUP", user);
-        res.redirect('/');
-    });
+// router.get('/google/callback',
+//     passport.authenticate('google', { failureRedirect: '/auth/signup' }),
+//     function(req, res) {
+//         const { user } = req.user;
+//         console.log("USER SIGNUP", user);
+//         res.redirect('/');
+//     });
 
 module.exports = router;

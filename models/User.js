@@ -3,9 +3,13 @@ const uniqueValidator = require("mongoose-unique-validator");
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
-    username: {
+    name: {
         type: String,
-        require: [true, "Name es requerido"]
+        default: "",
+    },
+    lastname: {
+        type: String,
+        default: "",
     },
     email: {
         type: String,
@@ -13,6 +17,7 @@ const userSchema = new Schema({
     },
     password: {
         type: String,
+        default: "",
         require: [true, "Password es requerida"]
     },
     googleid: {
@@ -23,9 +28,9 @@ const userSchema = new Schema({
         type: Boolean,
         default: false
     },
-    state: {
+    active: {
         type: String,
-        default: true
+        default: false
     },
     role: {
         type: String,

@@ -33,7 +33,8 @@ app.use(cookieParser());
 //conexion a la base de datos
 mongoose.connect(`mongodb://localhost:${DB_PORT}/app`, {
         useNewUrlParser: true,
-        useUnifiedTopology: true
+        useUnifiedTopology: true,
+        useFindAndModify: false
     })
     .then(() => console.log(`Base de datos conectada en el puerto ${DB_PORT}`))
     .catch(err => { throw err })
@@ -137,20 +138,24 @@ passport.use(
 passport.use(new GoogleStrategy({
         clientID: GOOGLE_CLIENT_ID,
         clientSecret: GOOGLE_CLIENT_SECRET,
-        callbackURL: "http://localhost:3000/auth/login/google/callback"
+        callbackURL: "http://localhost:3000/auth/authgoogle"
     },
-    async function(accessToken, refreshToken, profile, next) {
+    async function(accessToken, refreshToken, profile, done) {
 
-        console.log(profile);
         const email = profile.emails[0].value;
+        const givenName = profile.name.givenName;
+        const familyName = profile.name.familyName;
 
-        const user = await User.findOneAndUpdate({ email }, { googleid: profile.id, googleauth: true }, { new: true, runValidators: true })
+        //Tengo la duda de que si lo encuentra que siempre lo actualice o
+        //lo separo en busca comprueba y si esta desactivado actualizalo
+        const user = await User.findOneAndUpdate({ email }, { name: givenName, lastname: familyName, googleid: profile.id, googleauth: true }, { new: true, runValidators: true })
+
         if (user) {
-            next(null, user);
+            return done(null, user);
         } else {
-            const newUser = new User({ username: null, email: email, password: null, googleid: profile.id, googleauth: true });
+            const newUser = new User({ email: email, name: givenName, lastname: familyName, googleid: profile.id, googleauth: true });
             const user = await newUser.save();
-            next(null, user);
+            return done(null, user);
         }
 
         /* try {

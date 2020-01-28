@@ -13,6 +13,7 @@ router.get("/", ensureLoggin.ensureLoggedIn("/auth/login"), function(
     res,
     next
 ) {
+    console.log("USUARIO" + req.user)
     res.render("index", { user: req.user });
 });
 
