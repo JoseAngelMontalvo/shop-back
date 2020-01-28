@@ -18,11 +18,20 @@ const userSchema = new Schema({
     },
     password: {
         type: String,
+        default: "",
         require: [true, "Password es requerida"]
     },
-    state: {
+    googleid: {
         type: String,
-        default: true
+        default: ""
+    },
+    googleauth: {
+        type: Boolean,
+        default: false
+    },
+    active: {
+        type: String,
+        default: false
     },
     role: {
         type: String,

@@ -1,0 +1,37 @@
+
+<form action="/auth/login" method="POST">
+<div class="row mt-5">
+    {{!-- <div class="form-group">
+        <label for="exampleInputEmail1">Email address</label>
+        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="email">
+        <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+    </div> --}}
+    <div class="col">
+        <div class="form-group">
+            <label for="exampleInputPassword1">Username</label>
+            <input type="text" class="form-control" id="exampleInputPassword1" name="userauth" placeholder="Email or Username">
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="form-group">
+            <label for="exampleInputPassword1">Password</label>
+            <input type="password" class="form-control" id="exampleInputPassword1" name="password" placeholder="Password">
+        </div>
+    </div>
+</div>
+
+    <div class="row">
+        <div class="col">
+            <h2>{{error}}</h2>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col">
+            <a href="/auth/login/google" class="btn btn-secondary">Sign On with Google</a>
+        </div>
+    </div>
+
+</form>
