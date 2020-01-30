@@ -6,15 +6,19 @@ const Schema = mongoose.Schema;
 const dateSpain = moment.tz(Date.now(), "Europe/Madrid"); */
 
 const userSchema = new Schema({
-    username: {
+    name: {
         type: String,
+        default: "",
         require: [true, "Name es requerido"],
-        //unique: true
+    },
+    lastname: {
+        type: String,
+        default: "",
+        require: [true, "LastName es requerido"],
     },
     email: {
         type: String,
         require: [true, "Email es requerido"],
-        //unique: true
     },
     password: {
         type: String,
@@ -24,6 +28,10 @@ const userSchema = new Schema({
     googleid: {
         type: String,
         default: ""
+    },
+    ownauth: {
+        type: Boolean,
+        default: false
     },
     googleauth: {
         type: Boolean,
