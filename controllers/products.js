@@ -5,22 +5,38 @@ module.exports = {
         const { id } = req.params;
         const {
             name,
+            category,
             description,
             price,
-            shop,
-            categories,
-            details,
-            createdby
+            shopId,
+            state,
+            thumb,
+            urlImages,
+            createDate,
+            modifyDate,
+            userCreate,
+            userMod,
+            highlight,
+            rating,
+            reviews,
         } = req.body;
         try {
             const newProduct = new Product({
                 name,
+                category,
                 description,
                 price,
-                shop,
-                categories,
-                details,
-                createdby: id
+                shopId,
+                state,
+                thumb,
+                urlImages,
+                createDate,
+                modifyDate,
+                userCreate: id,
+                userMod,
+                highlight,
+                rating,
+                reviews
             })
             const productDB = await newProduct.save();
             res.status(200).json(productDB);
@@ -59,6 +75,14 @@ module.exports = {
             res.status(402).json(error);
         }
     },
+    getAllProducts: async(req, res) => {
+        try {
+            const allproducts = await Product.find();
+            res.status(200).json(allproducts);
+        } catch (error) {
+            res.status(400).json({ message: "Internal server error, no products get" });
+        }
+    },
     addRate: async(req, res) => {
         const { id } = req.params;
         const {
@@ -77,33 +101,6 @@ module.exports = {
         } catch (error) {
             res.status(402).json(error);
         }
-    },
-    // bdxgdxg: async(req, res) => {
-    //     const { id } = req.params;
-    //     const {
-    //         name,
-    //         description,
-    //         price,
-    //         shop,
-    //         categories,
-    //         details,
-    //         faq,
-    //         ratings
-    //     } = req.body;
+    }
 
-    //     const newfaq = { id, resp: faq[0].resp };
-    //     const newratings = { id, rate: ratings[0].rate, valoration: ratings[0].valoration };
-    //     const newProduct = new Product({
-    //         name,
-    //         description,
-    //         price,
-    //         shop,
-    //         categories,
-    //         details,
-    //         faq: newfaq,
-    //         ratings: newratings
-    //     })
-    //     const productDB = await newProduct.save();
-    //     res.status(200).json(productDB);
-    // },
 }

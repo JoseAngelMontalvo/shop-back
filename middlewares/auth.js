@@ -28,9 +28,9 @@ module.exports = {
                 messageEmail: `El usuario con el email ${email}, ya existe`
             });
 
-        if (validationEmail && validationEmail.googleauth == true && validationEmail.ownauth == false) {
-            next(validationEmail);
-        }
+        // if (validationEmail && validationEmail.googleauth == true && validationEmail.ownauth == false) {
+        //     next(validationEmail);
+        // }
 
 
         const regex = /^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{8,16}$/;

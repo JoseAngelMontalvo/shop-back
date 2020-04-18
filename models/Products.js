@@ -5,48 +5,53 @@ const Schema = mongoose.Schema;
 const productSchema = new Schema({
     name: {
         type: String,
-        require: [true, "Name es requerido"]
+        require: [true, "Name is required"]
+    },
+    category: {
+        type: String,
+        require: [true, "Category is required"]
     },
     description: {
         type: String,
-        require: [true, "Descripción es requerida"]
+        require: [true, "Descripción is required"]
     },
     price: {
-        type: String,
-        require: [true, "Precio es requerido"]
+        type: Number,
+        require: [true, "Price is required"]
     },
-    shop: {
+    shopId: {
         type: String,
-        require: [true, "Tienda es requerido"]
+        require: [true, "ShopId is required"]
     },
-    categories: {
+    state: {
+        type: String,
+        default: "DEACTIVATED",
+        enum: ["ACTIVATED", "DEACTIVATED"]
+    },
+    thumb: {
+        type: String,
+        require: [true, "thumb is required"]
+    },
+    urlImages: {
         type: Array,
-        require: [true, "Categoria es requerida"],
-        default: "Otras",
-        //enum: ["Otras", "Moda", "Electrodomesticos", "Telefonía móvil", "Deporte y Ocio"]
+        require: [true, "urlImages is required"]
     },
-    details: {
-        type: String
+    userCreate: {
+        type: String,
+        require: [true, "userCreate is required"]
     },
-    createdby: {
-        type: String
+    highLight: {
+        type: Boolean,
+        default: false
     },
-    updatedby: {
-        type: String
+    rating: {
+        type: Number,
+        default: 0
     },
-    faq: [{
-        id: { type: String },
-        resp: { type: String }
-    }],
-    ratings: [{
-        iduser: { type: String },
-        rate: { type: String },
-        valoration: { type: String }
-    }],
-    date: {
-        type: Date,
-        default: Date.now
-    }
+    reviews: {
+        type: Array,
+        default: [""]
+    },
 }, {
     timestamps: true,
     createdAt: true

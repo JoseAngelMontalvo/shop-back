@@ -8,9 +8,17 @@ const logger = require('morgan');
 const DB_PORT = process.env.DB_PORT;
 const bodyParser = require("body-parser");
 const indexRouter = require('./routes/index');
+const cors = require('cors')
 
 
 const app = express();
+
+var corsOptions = {
+    origin: 'http://example.com:3000',
+    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+}
+
+app.use(cors())
 
 require("./passport/config")(app);
 

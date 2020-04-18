@@ -8,12 +8,10 @@ const dateSpain = moment.tz(Date.now(), "Europe/Madrid"); */
 const userSchema = new Schema({
     name: {
         type: String,
-        default: "",
         require: [true, "Name es requerido"],
     },
     lastname: {
         type: String,
-        default: "",
         require: [true, "LastName es requerido"],
     },
     email: {
@@ -37,14 +35,27 @@ const userSchema = new Schema({
         type: Boolean,
         default: false
     },
-    active: {
+    state: {
         type: String,
-        default: false
+        default: "DEACTIVATED",
+        enum: ["ACTIVATED", "DEACTIVATED"]
     },
     role: {
         type: String,
         default: "USER_ROLE",
         enum: ["USER_ROLE", "ADMIN_ROLE", "SUPERADMIN_ROLE"]
+    },
+    products: {
+        type: Array,
+        default: [""]
+    },
+    shops: {
+        type: Array,
+        default: [""]
+    },
+    reviews: {
+        type: Array,
+        default: [""]
     },
     date: {
         type: Date,

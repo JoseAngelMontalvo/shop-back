@@ -59,6 +59,7 @@ module.exports = {
             const { id } = req.params;
             const userDB = await User.findById(id);
             res.status(200).json(userDB);
+
         } catch (error) {
             res.status(400).json({ message: "Internal server error, no user get" });
         }
