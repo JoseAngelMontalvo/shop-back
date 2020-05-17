@@ -1,26 +1,30 @@
 const passport = require("passport");
-const session = require("express-session");
-const MongoStore = require('connect-mongo')(session);
+//const session = require("express-session");
+//const MongoStore = require('connect-mongo')(session);
+//const mongoose = require("mongoose");
 const User = require("../models/User");
 const flash = require("connect-flash");
-const mongoose = require("mongoose");
+
 
 module.exports = app => {
     // 1.1 CONFIGURAMOS EN EXPRESS LA CONFIGURACIÓN DE PASSPORT
 
-    //login
-    app.use(
+    // Esto es para sessions
+    /*app.use(
         session({
-            saveUninitialized: false, // saved new sessions
-            resave: false, // do not automatically write to the session store
+            saveUninitialized: true, // saved new sessions
+            resave: true, // do not automatically write to the session store
             //touchAfter: 60,
             store: new MongoStore({ mongooseConnection: mongoose.connection }),
             secret: "passport-authentication",
             cookie: { httpOnly: true, maxAge: 3600000 } // configure when sessions expires
         })
-    );
+    );*/
+
     app.use(passport.initialize());
-    app.use(passport.session());
+
+    // Esto es para sessions
+    /*app.use(passport.session());
 
     passport.serializeUser((user, callback) => {
         console.log("SERIALIZADOR:");
@@ -39,7 +43,7 @@ module.exports = app => {
         } catch (error) {
             return callback(error);
         }
-    });
+    });*/
 
     // 1.2. DEFINIMOS LA ESTRATEGIA LOCAL.
     /* Esta estrategia servirá para establecer el login. 
@@ -49,6 +53,8 @@ module.exports = app => {
     passport.use(require("./strategies/localStrategy"));
     // 1.3. Tras esta función definiremos la ruta login (ir a ./routes/auth/login para continuar)
 
+
+    passport.use(require("./strategies/jwtStrategy"));
     passport.use(require("./strategies/googleStrategy"));
 
     app.use(flash());

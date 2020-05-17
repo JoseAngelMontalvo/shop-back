@@ -52,6 +52,16 @@ const productSchema = new Schema({
         type: Array,
         default: [""]
     },
+    location: {
+        type: {
+            type: String,
+            default: "Point"
+        },
+        coordinates: {
+            type: Array,
+            default: [""]
+        }
+    }
 }, {
     timestamps: true,
     createdAt: true

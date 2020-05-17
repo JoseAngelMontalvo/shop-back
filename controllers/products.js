@@ -83,6 +83,76 @@ module.exports = {
             res.status(400).json({ message: "Internal server error, no products get" });
         }
     },
+    getProductById: async(req, res) => {
+        const { id } = req.params;
+        try {
+            const product = await Product.findById(id);
+            res.status(200).json(product);
+        } catch (error) {
+            res.status(400).json({ message: "Internal server error, no product get by id" });
+        }
+    },
+    getProductSearch: async(req, res) => {
+        const { keyWord, category, minPrice, maxPrice, sort } = req.query;
+        let sortQry = {}
+        console.log(sort)
+        switch (sort) {
+            case "lowPrice":
+                sortQry = { "price": 1 }
+                break;
+            case "highPrice":
+                sortQry = { "price": -1 }
+                break;
+            case "rate":
+                sortQry = { "rating": -1 }
+                break;
+        }
+        try {
+            if (keyWord === "") {
+                if (category === 'Todas las categorias') {
+                    const products = await Product.find({
+                        $and: [
+                            { price: { $gte: minPrice } },
+                            { price: { $lte: maxPrice } },
+                        ]
+                    }).sort(sortQry)
+                    res.status(200).json(products);
+                } else {
+                    const products = await Product.find({
+                        $and: [
+                            { categoryName: { $eq: category } },
+                            { price: { $gte: minPrice } },
+                            { price: { $lte: maxPrice } },
+                        ]
+                    }).sort(sortQry)
+                    res.status(200).json(products);
+                }
+            } else {
+                if (category === 'Todas las categorias') {
+                    const products = await Product.find({
+                        $and: [
+                            { $text: { $search: keyWord } },
+                            { price: { $gte: minPrice } },
+                            { price: { $lte: maxPrice } },
+                        ]
+                    }).sort(sortQry)
+                    res.status(200).json(products);
+                } else {
+                    const products = await Product.find({
+                        $and: [
+                            { $text: { $search: keyWord } },
+                            { categoryName: { $eq: category } },
+                            { price: { $gte: minPrice } },
+                            { price: { $lte: maxPrice } },
+                        ]
+                    }).sort(sortQry)
+                    res.status(200).json(products);
+                }
+            }
+        } catch (error) {
+            res.status(400).json({ message: "Algo ha fallado Sorry" });
+        }
+    },
     addRate: async(req, res) => {
         const { id } = req.params;
         const {
