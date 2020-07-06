@@ -6,11 +6,13 @@ const usersRouter = require('./users');
 const productsRouter = require('./products');
 const categoriesRouter = require('./categories');
 const authRouter = require("./auth");
+const shoppingCart = require("./shoppingcart");
 
 router.use('/users', usersRouter);
 router.use('/products', productsRouter);
 router.use('/categories', categoriesRouter);
 router.use("/auth", authRouter);
+router.use("/shoppingcart", shoppingCart);
 
 
 

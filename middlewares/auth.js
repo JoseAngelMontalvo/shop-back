@@ -2,8 +2,8 @@ const User = require("../models/User");
 
 module.exports = {
     signUp: async(req, res, next) => {
-
-        const { name, lastname, email, password, confirmpassword } = req.body;
+        console.log(req.body);
+        const { name, lastName, email, password, confirmPassword } = req.body;
         let errors = [];
 
         if (!name.length) {
@@ -11,7 +11,7 @@ module.exports = {
                 messageEmptyName: `Debe introducir un username`,
             });
         }
-        if (!lastname.length) {
+        if (!lastName.length) {
             errors.push({
                 messageEmptyName: `Debe introducir un lastname`,
             });
@@ -39,7 +39,7 @@ module.exports = {
                 messagePasword: `La contraseña introducida no cumple los requisitos minimos`
             });
 
-        if (password != confirmpassword)
+        if (password != confirmPassword)
             errors.push({
                 messageconfirmPassword: `Las contraseñas no coinciden`
             });

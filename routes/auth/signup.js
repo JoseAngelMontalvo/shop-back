@@ -6,7 +6,7 @@ const validate = require("../../middlewares/auth");
 
 router.get("/", (req, res) => res.render("auth/signup"));
 
-router.post("/", validate.signUp, userController.signUp);
+router.post("/", validate.signUp, userController.emailToLowerCase, userController.signUp);
 
 
 

@@ -24,7 +24,7 @@ module.exports = {
         const hashPass = bcrypt.hashSync(password, 10);
         const userdata = { username, email, password: hashPass, role };
 
-        try {;
+        try {
             const options = {
                 new: true,
                 runValidators: true
@@ -73,25 +73,4 @@ module.exports = {
             res.status(400).json({ message: "Internal server error, no user get by username and role" });
         }
     }
-
-    /* router.get("/get/:name/:lastname", async (req, res) => {
-    const { name, lastname } = req.params;
-    try {
-      const userDB = await User.find({ $and: [{ name }, { _id: lastname }], { password: 0 })
-        .skip(4)
-        .limit(10);
-  
-      const usersCount = await User.count({})
-        .skip(4)
-        .limit(10);
-  
-      res.json({ userDB, usersCount });
-    } catch (error) {
-      console.log(error);
-      res.status(400).json(error);
-    }
-  }); */
-
-
-
 };

@@ -14,16 +14,16 @@ module.exports = new LocalStrategy({
     },
     async(email, password, next) => {
         try {
-            const user = await User.findOne({ email });
-            if (!user)
+            const userDB = await User.findOne({ email });
+            if (!userDB)
                 return next(null, false, { message: "El usuario no existe" });
 
-            if (!bcrypt.compareSync(password, user.password))
+            if (!bcrypt.compareSync(password, userDB.password))
                 return next(null, false, { message: "La contraseña no es correcta" });
 
             //Antes de mandar el user podemos borrar campos como
             //delete user.password
-            next(null, user);
+            next(null, userDB);
 
         } catch (error) {
             next(error);
