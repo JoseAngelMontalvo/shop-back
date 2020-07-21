@@ -10,7 +10,7 @@ const userSchema = new Schema({
         type: String,
         require: [true, "Name es requerido"],
     },
-    lastname: {
+    lastName: {
         type: String,
         require: [true, "LastName es requerido"],
     },

@@ -2,6 +2,7 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 
 module.exports = {
+    //No aplica a proyecto
     newUser: async(req, res) => {
 
         const { username, email, password, role } = req.body;
@@ -19,12 +20,10 @@ module.exports = {
     },
     updateUser: async(req, res) => {
 
-        const { id } = req.params;
-        const { username, email, password, role } = req.body;
-        const hashPass = bcrypt.hashSync(password, 10);
-        const userdata = { username, email, password: hashPass, role };
+        const { id, name, lastName, email } = req.body;
+        const userdata = { name, lastName, email };
 
-        try {;
+        try {
             const options = {
                 new: true,
                 runValidators: true
@@ -35,6 +34,26 @@ module.exports = {
             res.status(400).json({ message: "Internal server error, no user update" });
         }
     },
+    //No aplica a proyecto
+    updatePassword: async(req, res) => {
+
+        const { id } = req.params;
+        const { username, email, password, role } = req.body;
+        const hashPass = bcrypt.hashSync(password, 10);
+        const userdata = { username, email, password: hashPass, role };
+
+        try {
+            const options = {
+                new: true,
+                runValidators: true
+            }
+            const userDB = await User.findByIdAndUpdate(id, userdata, options);
+            res.status(200).json(userDB);
+        } catch (error) {
+            res.status(400).json({ message: "Internal server error, no user update" });
+        }
+    },
+    //No aplica a proyecto
     deleteUser: async(req, res) => {
         const { id } = req.params;
         try {
@@ -45,6 +64,7 @@ module.exports = {
         }
 
     },
+    //No aplica a proyecto
     getAllUsers: async(req, res) => {
         try {
             const allusers = await User.find();
@@ -53,6 +73,7 @@ module.exports = {
             res.status(400).json({ message: "Internal server error, no users get" });
         }
     },
+    //No aplica a proyecto
     getUserById: async(req, res) => {
         try {
 
@@ -64,6 +85,7 @@ module.exports = {
             res.status(400).json({ message: "Internal server error, no user get" });
         }
     },
+    //No aplica a proyecto
     getUserByUsernameAndRole: async(req, res) => {
         try {
             const { username, role } = req.params;
@@ -73,25 +95,4 @@ module.exports = {
             res.status(400).json({ message: "Internal server error, no user get by username and role" });
         }
     }
-
-    /* router.get("/get/:name/:lastname", async (req, res) => {
-    const { name, lastname } = req.params;
-    try {
-      const userDB = await User.find({ $and: [{ name }, { _id: lastname }], { password: 0 })
-        .skip(4)
-        .limit(10);
-  
-      const usersCount = await User.count({})
-        .skip(4)
-        .limit(10);
-  
-      res.json({ userDB, usersCount });
-    } catch (error) {
-      console.log(error);
-      res.status(400).json(error);
-    }
-  }); */
-
-
-
 };

@@ -1,6 +1,7 @@
 const Product = require("../models/Products");
 const mongo = require('mongodb');
 module.exports = {
+    //Via Postman
     newProduct: async(req, res) => {
         const { id } = req.params;
         const {
@@ -44,6 +45,7 @@ module.exports = {
             res.status(402).json(error);
         }
     },
+    //Via Postman
     updateProduct: async(req, res) => {
         const { id } = req.params;
         const {
@@ -94,8 +96,9 @@ module.exports = {
     },
     getProductSearch: async(req, res) => {
         const { keyWord, category, minPrice, maxPrice, sort } = req.query;
+        let query = req.query;
+
         let sortQry = {}
-        console.log(sort)
         switch (sort) {
             case "lowPrice":
                 sortQry = { "price": 1 }
@@ -108,6 +111,10 @@ module.exports = {
                 break;
         }
         try {
+            if (Object.keys(query).length === 0) {
+                const products = await Product.find();
+                res.status(200).json(products);
+            }
             if (keyWord === "") {
                 if (category === 'Todas las categorias') {
                     const products = await Product.find({
@@ -150,9 +157,10 @@ module.exports = {
                 }
             }
         } catch (error) {
-            res.status(400).json({ message: "Algo ha fallado Sorry" });
+            res.status(500).json({ message: "Algo ha fallado Sorry" });
         }
     },
+    //No aplica a proyecto
     addRate: async(req, res) => {
         const { id } = req.params;
         const {

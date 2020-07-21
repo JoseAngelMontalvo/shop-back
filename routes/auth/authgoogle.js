@@ -6,7 +6,6 @@ const passport = require("passport");
 router.get('/',
     passport.authenticate('google', { failureRedirect: '/auth/signup' }),
     (req, res) => {
-        //const user = req.user;
         res.redirect("/");
     });
 

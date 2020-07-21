@@ -2,21 +2,16 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
-const { createToken } = require("../../controllers/token");
-const { emailToLowerCase } = require("../../controllers/auth");
+
+
+
 
 router.get("/", (req, res) => {
-    res.render("auth/login", { error: req.flash("error")[0] });
-});
 
-router.post("/", emailToLowerCase, (req, res) => {
-    passport.authenticate("local", { session: false }, (error, userDB, info) => {
+    passport.authenticate("jwt", { session: false }, (error, userDB, info) => {
 
-        if (error) res.status(500).json({ message: "Hubo un error" });
-
+        if (error) res.status(500).json({ message: "Hubo un error en la obtencion del perfil usuario" });
         if (info) res.status(400).json({ message: info });
-
-        const token = createToken(userDB);
         const user = {
             "id": userDB._id,
             "name": userDB.name,
@@ -25,7 +20,8 @@ router.post("/", emailToLowerCase, (req, res) => {
             "role": userDB.role
         }
 
-        res.status(200).json({ user, token });
+        res.status(200).json({ user });
+
     })(req, res);
 });
 

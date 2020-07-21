@@ -2,9 +2,6 @@ const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
 const Schema = mongoose.Schema;
 
-/* const moment = require('moment-timezone');
-const dateSpain = moment.tz(Date.now(), "Europe/Madrid"); */
-
 const categorySchema = new Schema({
     text: {
         type: String,

@@ -15,8 +15,6 @@ module.exports = new GoogleStrategy({
         const givenName = profile.name.givenName;
         const familyName = profile.name.familyName;
 
-        //Tengo la duda de que si lo encuentra que siempre lo actualice o
-        //lo separo en busca comprueba y si esta desactivado actualizalo
         const user = await User.findOneAndUpdate({ email }, { googleid: profile.id, googleauth: true }, { new: true, runValidators: true })
 
         if (user) {
@@ -26,7 +24,6 @@ module.exports = new GoogleStrategy({
             const user = await newUser.save();
             return done(null, user);
         }
-
 
     }
 );

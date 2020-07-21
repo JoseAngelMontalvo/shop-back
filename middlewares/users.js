@@ -1,6 +1,7 @@
 const User = require("../models/User");
 
 module.exports = {
+    //No aplica a proyecto
     newUser: async(req, res, next) => {
 
         const { username, email, password, confirmPassword, role } = req.body;
@@ -53,6 +54,41 @@ module.exports = {
     },
 
     updateUser: async(req, res, next) => {
+
+        const { id, name, lastName, email } = req.body;
+        let errors = [];
+
+        if (!id)
+            return res.status(422).json({ messageNoId: "No se ha proporcionado un id", ok: false });
+
+        const validateUserId = await User.findById(id);
+        if (validateUserId === null)
+            return res.status(422).json({ messageNoUser: `El usuario con el id ${id} no existe`, ok: false });
+
+        if (!name.length) {
+            errors.push({
+                messageEmptyName: `Debe introducir un name`,
+            });
+        }
+
+        const regexEmail = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        if (!regexEmail.test(email))
+            errors.push({
+                messageInvalidEmail: `El email introducido no es un email valido`
+            });
+
+        const validationEmail = await User.findOne({ email });
+
+        if (validationEmail && validationEmail.id !== id)
+            errors.push({
+                messageEmail: `Lo sentimos ya existe un usuario con este email: ${email}`
+            });
+
+        if (errors.length) return res.status(422).json({ errors: errors, ok: false });
+
+        next()
+    },
+    updatePassword: async(req, res, next) => {
         const { id } = req.params;
         const { username, email, password, confirmPassword, role } = req.body;
         let errors = [];
@@ -109,7 +145,7 @@ module.exports = {
 
         next()
     },
-
+    //No aplica a proyecto
     deleteUser: async(req, res, next) => {
         const { id } = req.params;
         if (!id.length)
@@ -122,7 +158,7 @@ module.exports = {
 
         next();
     },
-
+    //No aplica a proyecto
     getAllUsers: async(req, res, next) => {
         const allUsers = await User.find();
         if (!allUsers.length)
@@ -130,7 +166,7 @@ module.exports = {
         next();
 
     },
-
+    //No aplica a proyecto
     getUserById: async(req, res, next) => {
         const { id } = req.params;
         if (!id.length)
@@ -143,6 +179,7 @@ module.exports = {
 
         next();
     },
+    //No aplica a proyecto
     getUserByUsernameAndRole: async(req, res, next) => {
         const { username, role } = req.params;
         let errors = [];

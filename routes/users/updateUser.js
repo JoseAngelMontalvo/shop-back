@@ -4,6 +4,6 @@ const userController = require("../../controllers/users");
 const validate = require("../../middlewares/users");
 
 
-router.post("/:id", validate.updateUser, userController.updateUser);
+router.post("/", validate.updateUser, userController.updateUser);
 
 module.exports = router;
